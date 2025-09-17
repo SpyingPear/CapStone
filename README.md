@@ -1,43 +1,56 @@
-# News Portal — Setup
+# News Portal — Setup & Run
 
-## 1. Requirements
-- Python 3.10–3.12
-- MariaDB/MySQL (or use SQLite for quick local runs)
-- `pip install -r requirements.txt`
+This project can be run **either** in a Python virtual environment or via **Docker**.
 
-## 2. Environment
-Create a `.env` next to `manage.py`:
+## Option A — Virtual Environment
 
-**MariaDB (default):**
-```env
-DEBUG=1
-SECRET_KEY=change-me
-USE_SQLITE=0
+1. Create & activate a venv
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # Windows: .venv\Scripts\activate
+   ```
 
-DB_NAME=news_portal
-DB_USER=root
-DB_PASSWORD=
-DB_HOST=127.0.0.1
-DB_PORT=3306
-```
+2. Install dependencies
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
 
-**SQLite (quick local):**
-```env
-DEBUG=1
-SECRET_KEY=dev-only
-USE_SQLITE=1
-```
+3. Apply migrations & run
+   ```bash
+   python manage.py migrate
+   python manage.py runserver
+   ```
+   Visit http://127.0.0.1:8000
 
-## 3. First run
+## Option B — Docker
+
+1. Build the image
+   ```bash
+   docker build -t news-portal .
+   ```
+
+2. Run the container
+   ```bash
+   docker run --env DJANGO_SETTINGS_MODULE=config.settings -p 8000:8000 news-portal
+   ```
+
+## Documentation (Sphinx)
+
+Auto-generated API docs live under `docs/`. To (re)generate:
+
 ```bash
-python manage.py check
-python manage.py makemigrations
-python manage.py migrate
-python manage.py runserver
+# from project root
+sphinx-apidoc -o docs/ .
+make -C docs html
 ```
 
-Visit http://127.0.0.1:8000/
+Ensure `docs/_build/` **is NOT** in `.gitignore` so reviewers can see the generated HTML.
 
-## 4. Tips
-- After each major edit, do a quick `python manage.py check` or `runserver` to catch syntax early.
-- If you add/modify models, re-run `makemigrations` and `migrate`.
+## Notes
+
+- If you use MySQL, set env vars in Docker run (or `.env`) accordingly:
+  ```bash
+  -e DB_NAME=... -e DB_USER=... -e DB_PASSWORD=... -e DB_HOST=... -e DB_PORT=3306
+  ```
+- The container entrypoint runs `migrate` and `collectstatic` automatically before starting the server.
