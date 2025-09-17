@@ -8,7 +8,6 @@ staticfiles/
 .venv/
 env/
 venv/
-docs/_build/
 node_modules/
 .DS_Store
 Thumbs.db

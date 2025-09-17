@@ -24,3 +24,6 @@
   },
   "readme": "updated with venv and Docker instructions"
 }
+## Follow-up fixes
+- Removed any `.gitignore` rule that would exclude `docs/_build/` (confirmed none present).
+- Committed generated documentation under `docs/_build/html/` and added README links.
