@@ -1,0 +1,6 @@
+Django>=4.2,<5.3
+djangorestframework>=3.14,<3.16
+requests>=2.31,<3
+mysqlclient>=2.1,<3
+python-dotenv>=1.0,<2
+Sphinx>=7.0

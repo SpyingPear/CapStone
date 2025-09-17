@@ -1,0 +1,13 @@
+{% extends 'news/base.html' %}
+{% block content %}
+<h1>Welcome to the News Portal</h1>
+{% if user.is_authenticated %}
+  <p>Hi {{ user.username }} — your role: <strong>{{ user.role }}</strong>.</p>
+  <ul>
+    <li><a href="{% url 'pending_articles' %}">Editor: Pending Articles</a></li>
+    <li><a href="{% url 'api_feed' %}">Reader: API Feed</a></li>
+  </ul>
+{% else %}
+  <p>Please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">create an account</a>.</p>
+{% endif %}
+{% endblock %}

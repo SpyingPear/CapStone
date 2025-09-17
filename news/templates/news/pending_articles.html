@@ -1,0 +1,26 @@
+{% extends "news/base.html" %}
+{% block content %}
+  <h2>Pending Articles</h2>
+  {% if articles %}
+    <table>
+      <thead><tr><th>Title</th><th>Author</th><th>Publisher</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for a in articles %}
+        <tr>
+          <td>{{ a.title }}</td>
+          <td>{{ a.author.username }}</td>
+          <td>{% if a.publisher %}{{ a.publisher.name }}{% else %}<em>Independent</em>{% endif %}</td>
+          <td>
+            <form method="post" action="{% url 'approve_article' a.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <button class="btn btn-primary" type="submit">Approve</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No pending articles 🎉</p>
+  {% endif %}
+{% endblock %}
