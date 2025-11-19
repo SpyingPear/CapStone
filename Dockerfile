@@ -4,7 +4,11 @@ FROM python:3.12
 WORKDIR /app
 
 # System deps (safer for mysqlclient)
-RUN apt-get update && apt-get install -y --no-install-recommends \        default-libmysqlclient-dev build-essential pkg-config \        && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    default-libmysqlclient-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy project metadata first for better caching
 COPY requirements.txt /app/requirements.txt

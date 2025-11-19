@@ -32,7 +32,7 @@ This project can be run **either** in a Python virtual environment or via **Dock
 
 2. Run the container
    ```bash
-   docker run --env DJANGO_SETTINGS_MODULE=config.settings -p 8000:8000 news-portal
+   docker run --env DJANGO_SETTINGS_MODULE=news_portal.settings -p 8000:8000 news-portal
    ```
 
 ## Documentation (Sphinx)

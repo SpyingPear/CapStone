@@ -11,9 +11,11 @@ from .models import Article, Newsletter, User, Publisher
 
 logger = logging.getLogger(__name__)
 
+
 def _ensure_groups_and_permissions():
     """
     Create the required groups and assign CRUD permissions per the brief.
+
     - Reader: view article/newsletter
     - Editor: view, change, delete article/newsletter
     - Journalist: add, view, change, delete article/newsletter
@@ -21,51 +23,58 @@ def _ensure_groups_and_permissions():
     article_ct = ContentType.objects.get_for_model(Article)
     newsletter_ct = ContentType.objects.get_for_model(Newsletter)
 
-    # Helper to fetch permissions by codename
-    def perm(model_ct, action):
-        return Permission.objects.get(content_type=model_ct, codename=f'{action}_{model_ct.model}')
+    def perm(model_ct, action, model_cls):
+        """Get or create a permission like 'view_article', 'add_newsletter', etc."""
+        codename = f"{action}_{model_ct.model}"
+        try:
+            return Permission.objects.get(content_type=model_ct, codename=codename)
+        except Permission.DoesNotExist:
+            return Permission.objects.create(
+                content_type=model_ct,
+                codename=codename,
+                name=f"Can {action} {model_cls._meta.verbose_name}",
+            )
 
     # Reader
-    reader, _ = Group.objects.get_or_create(name='Reader')
+    reader, _ = Group.objects.get_or_create(name="Reader")
     reader_perms = [
-        perm(article_ct, 'view'),
-        perm(newsletter_ct, 'view'),
+        perm(article_ct, "view", Article),
+        perm(newsletter_ct, "view", Newsletter),
     ]
     reader.permissions.set(reader_perms)
 
     # Editor
-    editor, _ = Group.objects.get_or_create(name='Editor')
+    editor, _ = Group.objects.get_or_create(name="Editor")
     editor_perms = [
-        perm(article_ct, 'view'),
-        perm(article_ct, 'change'),
-        perm(article_ct, 'delete'),
-        perm(newsletter_ct, 'view'),
-        perm(newsletter_ct, 'change'),
-        perm(newsletter_ct, 'delete'),
+        perm(article_ct, "view", Article),
+        perm(article_ct, "change", Article),
+        perm(article_ct, "delete", Article),
+        perm(newsletter_ct, "view", Newsletter),
+        perm(newsletter_ct, "change", Newsletter),
+        perm(newsletter_ct, "delete", Newsletter),
     ]
     editor.permissions.set(editor_perms)
 
     # Journalist
-    journalist, _ = Group.objects.get_or_create(name='Journalist')
+    journalist, _ = Group.objects.get_or_create(name="Journalist")
     journalist_perms = [
-        perm(article_ct, 'add'),
-        perm(article_ct, 'view'),
-        perm(article_ct, 'change'),
-        perm(article_ct, 'delete'),
-        perm(newsletter_ct, 'add'),
-        perm(newsletter_ct, 'view'),
-        perm(newsletter_ct, 'change'),
-        perm(newsletter_ct, 'delete'),
+        perm(article_ct, "add", Article),
+        perm(article_ct, "view", Article),
+        perm(article_ct, "change", Article),
+        perm(article_ct, "delete", Article),
+        perm(newsletter_ct, "add", Newsletter),
+        perm(newsletter_ct, "view", Newsletter),
+        perm(newsletter_ct, "change", Newsletter),
+        perm(newsletter_ct, "delete", Newsletter),
     ]
     journalist.permissions.set(journalist_perms)
 
+
 @receiver(post_migrate)
 def create_groups_on_migrate(sender, **kwargs):
-    # Ensure groups/permissions exist after migrations
-    try:
-        _ensure_groups_and_permissions()
-    except Exception as exc:
-        logger.warning("Could not create groups/permissions yet: %s", exc)
+    """Ensure groups/permissions exist after migrations."""
+    _ensure_groups_and_permissions()
+
 
 @receiver(post_save, sender=Article)
 def sync_independent_article(sender, instance: Article, created, **kwargs):
